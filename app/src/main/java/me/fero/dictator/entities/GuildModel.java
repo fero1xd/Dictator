@@ -13,15 +13,19 @@ public class GuildModel implements Serializable {
     private HashMap<String, String> variables;
     private HashMap<String, Boolean> enabledLogs;
     private List<HashMap<String, String>> warns;
+    private List<HashMap<String, String>> afks;
     private Set<String> mutes;
 
-    public GuildModel(Long guildId, String prefix, HashMap<String, String> variables, HashMap<String, Boolean> enabled, List<HashMap<String, String>> warns, Set<String> mutes) {
+
+    public GuildModel(Long guildId, String prefix, HashMap<String, String> variables, HashMap<String, Boolean> enabled,
+                      List<HashMap<String, String>> warns, Set<String> mutes, List<HashMap<String, String>> afks) {
         this.guildId = guildId;
         this.prefix = prefix;
         this.variables = variables;
         this.enabledLogs = enabled;
         this.warns = warns;
         this.mutes = mutes;
+        this.afks = afks;
     }
 
     public String getPrefixOfGuild() {
@@ -44,15 +48,31 @@ public class GuildModel implements Serializable {
         return this.enabledLogs.get(key.toLowerCase());
     }
 
-    public void addRecordToList(Document doc, String field) {
+    public void addRecordToObjectList(Document doc, String field) {
         if(Objects.equals(field, MongoDBFieldTypes.WARNS_FIELD)) {
             addWarns(doc);
+        }
+        if(Objects.equals(field, MongoDBFieldTypes.AFK_FIELD)) {
+            addAfk(doc);
+        }
+    }
+
+    public void removeRecordFromList(HashMap<String, String> map, String field) {
+        if(Objects.equals(field, MongoDBFieldTypes.WARNS_FIELD)) {
+//            this.warns.removeIf(entry -> entry.containsKey("_id") && entry.get("_id").equals(doc.get("_id").toString()));
+            this.warns.remove(map);
+        }
+        if(Objects.equals(field, MongoDBFieldTypes.AFK_FIELD)) {
+//            this.afks.removeIf(entry -> entry.containsKey("_id") && entry.get("_id").equals(doc.get("_id").toString()));
+            this.warns.remove(map);
         }
     }
 
     public List<HashMap<String, String>> getWarns() {
         return this.warns;
     }
+    public List<HashMap<String, String>> getAfks() { return  this.afks; }
+
 
     private void addWarns(Document doc) {
         HashMap map = new HashMap();
@@ -63,21 +83,39 @@ public class GuildModel implements Serializable {
         this.warns.add(map);
     }
 
+    private void addAfk(Document doc) {
+        HashMap map = new HashMap();
+        for(String key : doc.keySet()) {
+            map.put(key, doc.get(key).toString());
+        }
+
+        this.afks.add(map);
+    }
+
     public void setStateOfLogging(String key, Boolean value) {
         this.enabledLogs.put(key, value);
     }
 
-    public Boolean hasMute(String key) {
-        return this.mutes.contains(key);
+    public Boolean hasItemInList(String listName, String key) {
+        if(listName.equalsIgnoreCase(MongoDBFieldTypes.MUTES_FIELD)) {
+            return this.mutes.contains(key);
+        }
+        return false;
     }
 
-
-
-    public void addMute(String key) {
-        this.mutes.add(key);
+    public void addItemToList(String listName, String key) {
+        if(listName.equalsIgnoreCase(MongoDBFieldTypes.MUTES_FIELD)) {
+            this.mutes.add(key);
+            return;
+        }
+        throw new IllegalArgumentException("Not correct listName");
     }
 
-    public void removeMute(String key) {
-        this.mutes.remove(key);
+    public void removeItemFromList(String listName, String key) {
+        if(listName.equalsIgnoreCase(MongoDBFieldTypes.MUTES_FIELD)) {
+            this.mutes.remove(key);
+            return;
+        }
+        throw new IllegalArgumentException("Not correct listName");
     }
 }

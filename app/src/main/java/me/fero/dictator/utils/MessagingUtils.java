@@ -1,8 +1,14 @@
 package me.fero.dictator.utils;
 
+import me.fero.dictator.database.MongoDBManager;
+import me.fero.dictator.entities.GuildModel;
+import me.fero.dictator.redis.RedisManager;
+import me.fero.dictator.types.MongoDBFieldTypes;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 
@@ -60,5 +66,44 @@ public class MessagingUtils {
         catch (Exception e) {
             return -1;
         }
+    }
+
+    public static boolean checkAfk(GuildMessageReceivedEvent event) {
+        // TODO : CHECK AFK
+//        List<Member> mentionedMembers = event.getMessage().getMentionedMembers();
+//        if(mentionedMembers.isEmpty() || event.getMember() == null) return false;
+//
+//        Guild guild = event.getGuild();
+//        long idLong = guild.getIdLong();
+//        GuildModel guildModel = RedisManager.INSTANCE.getGuildModel(idLong);
+//        String key = guild.getId() + "-" + event.getMember().getId();
+//
+//        List<HashMap<String, String>> afks = guildModel.getAfks();
+//
+//        for(HashMap<String, String> afk : afks) {
+//            if(afk.containsKey(key))  {
+//                System.out.println(true);
+//                Member memberAfk = null;
+//                for(Member member : mentionedMembers) {
+//                    if(member.getId().equals(event.getMember().getId())) {
+//                        memberAfk = member;
+//                    }
+//                }
+//
+//                if(memberAfk == null) return false;
+//
+//                if(memberAfk == event.getMember()) {
+//                    RedisManager.INSTANCE.removeRecordFromList(idLong, MongoDBFieldTypes.AFK_FIELD, afk);
+//                    MongoDBManager.INSTANCE.removeRecordFromList(idLong, MongoDBFieldTypes.AFK_FIELD, afk);
+//                    event.getChannel().sendMessageEmbeds(Embeds.createBuilder(null, "Welcome back " + memberAfk.getAsMention() + ".", null, null, null).build()).queue();
+//                    return false;
+//                }
+//
+//                event.getChannel().sendMessageEmbeds(Embeds.createBuilder(null, memberAfk.getUser().getAsTag() + " is AFK : " + afk.get(key), null, null, null).build()).queue();
+//                return true;
+//            }
+//        }
+
+        return false;
     }
 }

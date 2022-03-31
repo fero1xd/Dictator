@@ -42,7 +42,6 @@ public class ModerationUtils {
             return;
         }
 
-
         TextChannel textChannelById = ctx.getGuild().getTextChannelById(modLogChannelId);
         if(modLogChannelId.equals(ctx.getChannel().getId())) return;
 

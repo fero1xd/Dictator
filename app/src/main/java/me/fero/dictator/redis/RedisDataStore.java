@@ -4,6 +4,8 @@ import me.fero.dictator.entities.GuildModel;
 import org.bson.Document;
 import org.redisson.api.RedissonClient;
 
+import java.util.HashMap;
+
 public interface RedisDataStore {
     RedisDataStore INSTANCE = new RedisManager();
     String getPrefix(Long guildId);
@@ -12,6 +14,7 @@ public interface RedisDataStore {
     GuildModel getGuildModel(Long guildId);
     void setVariable(Long guildId, String key, String value);
     void addRecordToList(Long guildId, String field, Document doc );
-    void addMute(Long guildId, String key);
-    void removeMute(Long guildId, String key);
+    void removeRecordFromList(Long guildId, String field, HashMap<String, String> map );
+    void addItemToList(Long guildId, String listName, String key);
+    void removeItemFromList(Long guildId, String listName, String key);
 }

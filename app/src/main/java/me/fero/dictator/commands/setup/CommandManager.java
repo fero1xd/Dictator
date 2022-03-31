@@ -34,6 +34,7 @@ public class CommandManager {
         addCommand(new Warn());
         addCommand(new Lock());
         addCommand(new Unlock());
+        addCommand(new Afk());
 
         addCommand(new ServerAvatar());
         addCommand(new UserAvatar());

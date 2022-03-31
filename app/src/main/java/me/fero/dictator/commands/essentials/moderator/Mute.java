@@ -1,8 +1,10 @@
 package me.fero.dictator.commands.essentials.moderator;
 
 import me.fero.dictator.commands.setup.context.CommandContext;
+import me.fero.dictator.database.MongoDBManager;
 import me.fero.dictator.redis.RedisManager;
 import me.fero.dictator.types.Logging;
+import me.fero.dictator.types.MongoDBFieldTypes;
 import me.fero.dictator.types.Variables;
 import me.fero.dictator.utils.MessagingUtils;
 import me.fero.dictator.utils.ModerationUtils;
@@ -73,7 +75,9 @@ public class Mute extends ModbaseCommand {
                                 ModerationUtils.logModChannel(ctx, ModerationUtils.successModerationLog(ctx, target, null, "unmuted", "They were muted for a specific time"), Logging.UNMUTE_LOG);
                                 ctx.getGuild().removeRoleFromMember(target, muteRole).queue();
                                 String key = ctx.getGuild().getId() + "-" + target.getId();
-                                RedisManager.INSTANCE.removeMute(ctx.getGuild().getIdLong(), key);
+                                RedisManager.INSTANCE.removeItemFromList(ctx.getGuild().getIdLong(), MongoDBFieldTypes.MUTES_FIELD, key);
+                                MongoDBManager.INSTANCE.removeItemFromList(ctx.getGuild().getIdLong(), MongoDBFieldTypes.MUTES_FIELD, key);
+
                             } catch(Exception e) {
                                 System.out.println("Error while removing mute role");
                             }

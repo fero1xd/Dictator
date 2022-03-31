@@ -75,28 +75,43 @@ public class MongoDBManager implements DatabaseManager{
     }
 
     @Override
-    public void addMuteToList(Long guildId, String key) {
-        Bson filter = Filters.eq("guild_id", guildId);
-        Bson updated = Updates.push(MongoDBFieldTypes.MUTES_FIELD, key);
-
-        this.db.getCollection("guild_settings").updateOne(filter, updated);
-    }
-//
-    @Override
-    public void removeMuteFromList(Long guildId, String key) {
+    public void removeRecordFromList(Long guildId, String field, HashMap<String, String> map) {
         Bson filter = Filters.eq("guild_id", guildId);
 
         MongoCollection<Document> guild_settings = this.db.getCollection("guild_settings");
         Document cursor = guild_settings.find(filter).first();
 
-        List<String> mutes = (List<String>) cursor.get(MongoDBFieldTypes.MUTES_FIELD);
+        List<Document> afks = (List<Document>) cursor.get(field);
+
+        List<Document> collect = afks.stream().filter(afk -> !afk.get("_id").toString().equals(map.get("_id"))).collect(Collectors.toList());
+
+        Bson updated = Updates.set(field, collect);
+        guild_settings.updateOne(filter, updated);
+    }
+
+    @Override
+    public void addItemToList(Long guildId, String listName, String key) {
+        Bson filter = Filters.eq("guild_id", guildId);
+        Bson updated = Updates.push(listName, key);
+
+        this.db.getCollection("guild_settings").updateOne(filter, updated);
+    }
+//
+    @Override
+    public void removeItemFromList(Long guildId, String listName, String key) {
+        Bson filter = Filters.eq("guild_id", guildId);
+
+        MongoCollection<Document> guild_settings = this.db.getCollection("guild_settings");
+        Document cursor = guild_settings.find(filter).first();
+
+        List<String> mutes = (List<String>) cursor.get(listName);
 
         int i = mutes.indexOf(key);
         if (i < 0) return;
 
         List<String> collect = mutes.stream().filter(mute -> !mute.equalsIgnoreCase(key)).collect(Collectors.toList());
 
-        Bson updated = Updates.set(MongoDBFieldTypes.MUTES_FIELD, collect);
+        Bson updated = Updates.set(listName, collect);
         guild_settings.updateOne(filter, updated);
     }
 
@@ -126,6 +141,7 @@ public class MongoDBManager implements DatabaseManager{
 
         newDoc.append("VARIABLES", variablesMap);
         newDoc.append("ENABLES", enabledMap);
+        newDoc.append(MongoDBFieldTypes.AFK_FIELD, new BasicDBList());
         newDoc.append(MongoDBFieldTypes.MUTES_FIELD, new BasicDBList());
         newDoc.append(MongoDBFieldTypes.WARNS_FIELD, new BasicDBList());
         return newDoc;

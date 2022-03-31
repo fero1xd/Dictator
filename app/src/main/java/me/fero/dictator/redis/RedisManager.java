@@ -11,7 +11,6 @@ import org.redisson.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.Key;
 import java.util.*;
 
 
@@ -44,11 +43,22 @@ public class RedisManager implements RedisDataStore{
             Document enabledLogs = (Document) guildSettings.get("ENABLES");
             List<Document> warns = (List<Document>) guildSettings.get(MongoDBFieldTypes.WARNS_FIELD);
             List<String> mutes = (List<String>) guildSettings.get(MongoDBFieldTypes.MUTES_FIELD);
+            List<Document> afks = (List<Document>) guildSettings.get(MongoDBFieldTypes.AFK_FIELD);
 
             HashMap<String, String> map = new HashMap<>();
             HashMap<String, Boolean> enabledMap = new HashMap<>();
             List<HashMap<String, String>> warnsList = new ArrayList<>();
+            List<HashMap<String, String>> afksList = new ArrayList<>();
             Set<String> mutesSet = new HashSet<>(mutes);
+
+            // For AFKS
+            for(Document doc : afks) {
+                HashMap<String, String> info = new HashMap<>();
+                for(String key : doc.keySet()) {
+                    info.put(key, doc.get(key).toString());
+                }
+                afksList.add(info);
+            }
 
             // For variables
             for(String key : variables.keySet()) {
@@ -73,7 +83,7 @@ public class RedisManager implements RedisDataStore{
                 warnsList.add(info);
             }
 
-            bucket.set(new GuildModel(guildId, prefix,  map, enabledMap, warnsList, mutesSet));
+            bucket.set(new GuildModel(guildId, prefix,  map, enabledMap, warnsList, mutesSet, afksList));
             return prefix;
         }
 
@@ -107,23 +117,31 @@ public class RedisManager implements RedisDataStore{
     public void addRecordToList(Long guildId, String field, Document doc) {
         RBucket<Object> bucket = this.redisson.getBucket(String.valueOf(guildId));
         GuildModel guild = (GuildModel) bucket.get();
-        guild.addRecordToList(doc, field);
+        guild.addRecordToObjectList(doc, field);
         bucket.set(guild);
     }
 
     @Override
-    public void addMute(Long guildId, String key) {
+    public void removeRecordFromList(Long guildId, String field, HashMap<String, String> map) {
         RBucket<Object> bucket = this.redisson.getBucket(String.valueOf(guildId));
         GuildModel guild = (GuildModel) bucket.get();
-        guild.addMute(key);
+        guild.removeRecordFromList(map, field);
         bucket.set(guild);
     }
 
     @Override
-    public void removeMute(Long guildId, String key) {
+    public void addItemToList(Long guildId, String listName, String key) {
         RBucket<Object> bucket = this.redisson.getBucket(String.valueOf(guildId));
         GuildModel guild = (GuildModel) bucket.get();
-        guild.removeMute(key);
+        guild.addItemToList(listName, key);
+        bucket.set(guild);
+    }
+
+    @Override
+    public void removeItemFromList(Long guildId, String listName, String key) {
+        RBucket<Object> bucket = this.redisson.getBucket(String.valueOf(guildId));
+        GuildModel guild = (GuildModel) bucket.get();
+        guild.removeItemFromList(listName, key);
         bucket.set(guild);
     }
 }

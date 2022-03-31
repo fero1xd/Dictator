@@ -4,6 +4,7 @@ import me.fero.dictator.commands.setup.context.CommandContext;
 import me.fero.dictator.database.MongoDBManager;
 import me.fero.dictator.redis.RedisManager;
 import me.fero.dictator.types.Logging;
+import me.fero.dictator.types.MongoDBFieldTypes;
 import me.fero.dictator.types.Variables;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -50,8 +51,8 @@ public class ModeratorActions {
         // Add mutes to db
         String key = ctx.getGuild().getId() + "-" + target.getId();
         long idLong = ctx.getGuild().getIdLong();
-        RedisManager.INSTANCE.addMute(idLong, key);
-        MongoDBManager.INSTANCE.addMuteToList(idLong, key);
+        RedisManager.INSTANCE.addItemToList(idLong, MongoDBFieldTypes.MUTES_FIELD, key);
+        MongoDBManager.INSTANCE.addItemToList(idLong, MongoDBFieldTypes.MUTES_FIELD, key);
 
         ModerationUtils.logModChannel(ctx, ModerationUtils.successModerationLog(ctx, target, null, "muted", reason), Logging.MUTE_LOG);
         if(logCurrentChannel) {

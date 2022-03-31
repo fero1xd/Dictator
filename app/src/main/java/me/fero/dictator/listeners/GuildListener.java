@@ -5,8 +5,10 @@ import me.fero.dictator.database.MongoDBManager;
 import me.fero.dictator.entities.GuildModel;
 import me.fero.dictator.redis.RedisDataStore;
 import me.fero.dictator.redis.RedisManager;
+import me.fero.dictator.types.MongoDBFieldTypes;
 import me.fero.dictator.types.Variables;
 import me.fero.dictator.utils.Embeds;
+import me.fero.dictator.utils.MessagingUtils;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -41,7 +43,7 @@ public class GuildListener extends ListenerAdapter {
         Member member = event.getMember();
         GuildModel guildModel = RedisManager.INSTANCE.getGuildModel(event.getGuild().getIdLong());
         String key = event.getGuild().getId() + "-" + member.getId();
-        Boolean hasMute = guildModel.hasMute(key);
+        Boolean hasMute = guildModel.hasItemInList(MongoDBFieldTypes.MUTES_FIELD, key);
 
         if(hasMute) {
             RedissonClient redisson = RedisManager.INSTANCE.getRedisson();
@@ -52,7 +54,6 @@ public class GuildListener extends ListenerAdapter {
             GuildModel guildSettings = (GuildModel) bucket.get();
             if(guildSettings == null) return;
 
-            if(!guildSettings.hasMute(key)) return;
             String roleId = guildSettings.getVariable(Variables.MUTE_ROLE_ID);
             if(roleId == null) return;
 
@@ -95,8 +96,8 @@ public class GuildListener extends ListenerAdapter {
 
 
         String key = guild.getId() + "-" + event.getMember().getId();
-        guildSettings.removeMute(key);
-        MongoDBManager.INSTANCE.removeMuteFromList(guildId, key);
+        guildSettings.removeItemFromList(MongoDBFieldTypes.MUTES_FIELD, key);
+        MongoDBManager.INSTANCE.removeItemFromList(guildId, MongoDBFieldTypes.MUTES_FIELD, key);
 
         bucket.set(guildSettings);
         LOGGER.info("Removed mute key from redis and db");
@@ -116,6 +117,7 @@ public class GuildListener extends ListenerAdapter {
         String mention = "<@!" + selfUser.getId() + ">";
 
 
+        if(MessagingUtils.checkAfk(event)) return;
 
         if(contentRaw.equalsIgnoreCase(mention)) {
             event.getChannel().sendMessageEmbeds(Embeds.createBuilder(null, "My prefix is `" + prefix + "`", null, null, null).build()).queue();
