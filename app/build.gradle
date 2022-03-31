@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
+}
+
+mainClassName = 'me.fero.dictator.Dictator'
+version '1.0'
+sourceCompatibility = 1.9
+
+repositories {
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+    jcenter()
+    mavenCentral()
+    maven {
+        name 'jfrog-duncte123'
+        url 'https://duncte123.jfrog.io/artifactory/maven'
+    }
+    maven {
+        url 'https://jitpack.io'
+    }
+    maven { url "https://m2.chew.pro/releases" }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    implementation 'net.dv8tion:JDA:4.4.0_352'
+    implementation 'com.jagrosh:jda-utilities:3.0.5'
+    implementation 'me.duncte123:botCommons:2.3.10'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    implementation 'io.github.cdimascio:dotenv-java:2.2.0'
+    implementation'org.redisson:redisson:3.16.8'
+    implementation 'org.mongodb:mongodb-driver-sync:4.0.5'
+
+    implementation platform('org.springframework.boot:spring-boot-dependencies:2.4.5')
+
+    implementation 'org.springframework.boot:spring-boot-starter'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+}
+
+compileJava.options.encoding = 'UTF-8'
+targetCompatibility = JavaVersion.VERSION_1_9
