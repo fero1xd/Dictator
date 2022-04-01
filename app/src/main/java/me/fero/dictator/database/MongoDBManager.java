@@ -96,7 +96,7 @@ public class MongoDBManager implements DatabaseManager{
 
         this.db.getCollection("guild_settings").updateOne(filter, updated);
     }
-//
+
     @Override
     public void removeItemFromList(Long guildId, String listName, String key) {
         Bson filter = Filters.eq("guild_id", guildId);

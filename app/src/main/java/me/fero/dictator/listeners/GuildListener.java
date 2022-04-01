@@ -8,6 +8,7 @@ import me.fero.dictator.redis.RedisManager;
 import me.fero.dictator.types.MongoDBFieldTypes;
 import me.fero.dictator.types.Variables;
 import me.fero.dictator.utils.Embeds;
+import me.fero.dictator.utils.ListenerUtils;
 import me.fero.dictator.utils.MessagingUtils;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
@@ -40,34 +41,8 @@ public class GuildListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
-        Member member = event.getMember();
-        GuildModel guildModel = RedisManager.INSTANCE.getGuildModel(event.getGuild().getIdLong());
-        String key = event.getGuild().getId() + "-" + member.getId();
-        Boolean hasMute = guildModel.hasItemInList(MongoDBFieldTypes.MUTES_FIELD, key);
-
-        if(hasMute) {
-            RedissonClient redisson = RedisManager.INSTANCE.getRedisson();
-            Guild guild = event.getGuild();
-            Long guildId = guild.getIdLong();
-            RBucket<Object> bucket = redisson.getBucket(guild.getId());
-
-            GuildModel guildSettings = (GuildModel) bucket.get();
-            if(guildSettings == null) return;
-
-            String roleId = guildSettings.getVariable(Variables.MUTE_ROLE_ID);
-            if(roleId == null) return;
-
-            Role roleById = guild.getRoleById(roleId);
-            if(roleById == null) {
-                RedisDataStore.INSTANCE.setVariable(guildId, Variables.MUTE_ROLE_ID, null);
-                MongoDBManager.INSTANCE.setVariable(guildId, Variables.MUTE_ROLE_ID, null);
-                return;
-            }
-
-
-            guild.addRoleToMember(event.getMember(), roleById).queue();
-            LOGGER.info("Added mute role to a member because they were already muted");
-        }
+        if(ListenerUtils.muteMemberOnRejoin(event)) return;
+        ListenerUtils.autoRoleMember(event);
     }
 
     @Override
@@ -117,7 +92,7 @@ public class GuildListener extends ListenerAdapter {
         String mention = "<@!" + selfUser.getId() + ">";
 
 
-        if(MessagingUtils.checkAfk(event)) return;
+        MessagingUtils.checkAfk(event);
 
         if(contentRaw.equalsIgnoreCase(mention)) {
             event.getChannel().sendMessageEmbeds(Embeds.createBuilder(null, "My prefix is `" + prefix + "`", null, null, null).build()).queue();

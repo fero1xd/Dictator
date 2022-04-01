@@ -59,19 +59,29 @@ public class GuildModel implements Serializable {
 
     public void removeRecordFromList(HashMap<String, String> map, String field) {
         if(Objects.equals(field, MongoDBFieldTypes.WARNS_FIELD)) {
-//            this.warns.removeIf(entry -> entry.containsKey("_id") && entry.get("_id").equals(doc.get("_id").toString()));
-            this.warns.remove(map);
+            this.warns.removeIf(warn -> warn.get("_id").equals(map.get("_id")));
         }
         if(Objects.equals(field, MongoDBFieldTypes.AFK_FIELD)) {
-//            this.afks.removeIf(entry -> entry.containsKey("_id") && entry.get("_id").equals(doc.get("_id").toString()));
-            this.warns.remove(map);
+            this.afks.removeIf(afk -> afk.get("_id").equals(map.get("_id")));
         }
+    }
+
+
+    public HashMap<String, String> hasRecordInList(String field, String key) {
+        if(Objects.equals(field, MongoDBFieldTypes.WARNS_FIELD)) {
+            return this.warns.stream().filter(warn -> warn.containsKey(key)).findFirst().orElse(null);
+        }
+        if(Objects.equals(field, MongoDBFieldTypes.AFK_FIELD)) {
+            return this.afks.stream().filter(afk -> afk.containsKey(key)).findFirst().orElse(null);
+        }
+        return null;
     }
 
     public List<HashMap<String, String>> getWarns() {
         return this.warns;
     }
-    public List<HashMap<String, String>> getAfks() { return  this.afks; }
+
+//    public List<HashMap<String, String>> getAfks() { return  this.afks; }
 
 
     private void addWarns(Document doc) {

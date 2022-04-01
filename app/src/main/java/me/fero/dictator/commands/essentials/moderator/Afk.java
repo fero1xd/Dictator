@@ -12,6 +12,8 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Timestamp;
+
 public class Afk extends ModbaseCommand {
 
     public Afk() {
@@ -31,6 +33,8 @@ public class Afk extends ModbaseCommand {
 
         Document doc = new Document("_id", ObjectId.get());
         doc.append(key, message);
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        doc.append("timestamp", timestamp);
 
         RedisManager.INSTANCE.addRecordToList(guild.getIdLong(), MongoDBFieldTypes.AFK_FIELD,  doc);
         MongoDBManager.INSTANCE.addRecordToList(guild.getIdLong(), MongoDBFieldTypes.AFK_FIELD, doc);

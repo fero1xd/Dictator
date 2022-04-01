@@ -68,42 +68,38 @@ public class MessagingUtils {
         }
     }
 
-    public static boolean checkAfk(GuildMessageReceivedEvent event) {
-        // TODO : CHECK AFK
-//        List<Member> mentionedMembers = event.getMessage().getMentionedMembers();
-//        if(mentionedMembers.isEmpty() || event.getMember() == null) return false;
-//
-//        Guild guild = event.getGuild();
-//        long idLong = guild.getIdLong();
-//        GuildModel guildModel = RedisManager.INSTANCE.getGuildModel(idLong);
-//        String key = guild.getId() + "-" + event.getMember().getId();
-//
-//        List<HashMap<String, String>> afks = guildModel.getAfks();
-//
-//        for(HashMap<String, String> afk : afks) {
-//            if(afk.containsKey(key))  {
-//                System.out.println(true);
-//                Member memberAfk = null;
-//                for(Member member : mentionedMembers) {
-//                    if(member.getId().equals(event.getMember().getId())) {
-//                        memberAfk = member;
-//                    }
-//                }
-//
-//                if(memberAfk == null) return false;
-//
-//                if(memberAfk == event.getMember()) {
-//                    RedisManager.INSTANCE.removeRecordFromList(idLong, MongoDBFieldTypes.AFK_FIELD, afk);
-//                    MongoDBManager.INSTANCE.removeRecordFromList(idLong, MongoDBFieldTypes.AFK_FIELD, afk);
-//                    event.getChannel().sendMessageEmbeds(Embeds.createBuilder(null, "Welcome back " + memberAfk.getAsMention() + ".", null, null, null).build()).queue();
-//                    return false;
-//                }
-//
-//                event.getChannel().sendMessageEmbeds(Embeds.createBuilder(null, memberAfk.getUser().getAsTag() + " is AFK : " + afk.get(key), null, null, null).build()).queue();
-//                return true;
-//            }
-//        }
+    public static void checkAfk(GuildMessageReceivedEvent event) {
+        List<Member> mentionedMembers = event.getMessage().getMentionedMembers();
+        Member author = event.getMember();
+        if(author == null) return;
 
-        return false;
+        Guild guild = event.getGuild();
+        long idLong = guild.getIdLong();
+        GuildModel guildModel = RedisManager.INSTANCE.getGuildModel(idLong);
+
+
+        String firstKey = idLong + "-" + author.getId();
+        HashMap<String, String> afkOfAuthor = guildModel.hasRecordInList(MongoDBFieldTypes.AFK_FIELD, firstKey);
+        if(afkOfAuthor != null) {
+            RedisManager.INSTANCE.removeRecordFromList(idLong, MongoDBFieldTypes.AFK_FIELD, afkOfAuthor);
+            MongoDBManager.INSTANCE.removeRecordFromList(idLong, MongoDBFieldTypes.AFK_FIELD, afkOfAuthor);
+            event.getChannel().sendMessageEmbeds(Embeds.createBuilder(null, "Welcome back " + author.getAsMention(), null, null, null).build()).queue();
+            return;
+        }
+
+        if(mentionedMembers.isEmpty()) return;
+
+
+        for(Member member : mentionedMembers) {
+            String key = idLong + "-" + member.getId();
+            HashMap<String, String> afk = guildModel.hasRecordInList(MongoDBFieldTypes.AFK_FIELD, key);
+            if(afk != null) {
+
+                String message = afk.get(key);
+                event.getChannel().sendMessageEmbeds(Embeds.createBuilder(null, member.getUser().getAsTag() + " is AFK : " + message, null, null, null).build()).queue();
+                return;
+            }
+        }
+
     }
 }

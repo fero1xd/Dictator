@@ -16,7 +16,6 @@ public class SocketController {
     @MessageMapping("/update-config")
     @SendTo("/topic/success")
     public String updateConfig(GuildConfig config) {
-        System.out.println(config);
 
         RedissonClient redisson = RedisManager.INSTANCE.getRedisson();
         RBucket<Object> bucket = redisson.getBucket(String.valueOf(config.getGuildId()));
