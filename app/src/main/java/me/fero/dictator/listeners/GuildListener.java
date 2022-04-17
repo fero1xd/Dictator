@@ -89,12 +89,12 @@ public class GuildListener extends ListenerAdapter {
         String contentRaw = event.getMessage().getContentRaw();
 
         User selfUser = event.getGuild().getSelfMember().getUser();
-        String mention = "<@!" + selfUser.getId() + ">";
+        String mention = "<@" + selfUser.getId() + ">";
 
 
         MessagingUtils.checkAfk(event);
 
-        if(contentRaw.equalsIgnoreCase(mention)) {
+        if(contentRaw.trim().equalsIgnoreCase(mention)) {
             event.getChannel().sendMessageEmbeds(Embeds.createBuilder(null, "My prefix is `" + prefix + "`", null, null, null).build()).queue();
             return;
         }

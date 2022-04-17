@@ -17,7 +17,7 @@ public class Ban extends ModbaseCommand{
         this.name = "ban";
         this.help = "Bans a member from then server";
         this.requiredArgs = true;
-        this.usage = "@nooblance";
+        this.usage = "@nooblance <reason>";
         this.botPermissions = List.of(Permission.BAN_MEMBERS);
         this.cooldown = 10;
     }
@@ -49,7 +49,11 @@ public class Ban extends ModbaseCommand{
         }
 
 
-        Member memberToBan = ctx.getMessage().getMentionedMembers().get(0);
+        Member memberToBan = ModerationUtils.parseMember(ctx.getArgs().get(0), ctx.getGuild());
+        if(memberToBan == null) {
+            ModerationUtils.noMentionFoundEmbed(ctx, "ban");
+            return;
+        }
         if(!ModerationUtils.canIntercat(member, memberToBan, selfMember, ctx, "ban", true)) return;
 
         ModeratorActions.banMember(ctx, memberToBan, reason, true, true, false);

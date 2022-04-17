@@ -1,4 +1,4 @@
-package me.fero.dictator.commands.essentials;
+package me.fero.dictator.commands.essentials.manager;
 
 import me.fero.dictator.database.DatabaseManager;
 import me.fero.dictator.commands.setup.context.CommandContext;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ChangePrefix extends Command {
+public class ChangePrefix extends ManagerBaseCommand {
 
     public ChangePrefix() {
         this.name = "prefix";

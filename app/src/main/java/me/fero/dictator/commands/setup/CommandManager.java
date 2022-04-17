@@ -1,12 +1,12 @@
 package me.fero.dictator.commands.setup;
 
-import me.fero.dictator.commands.essentials.Help;
-import me.fero.dictator.commands.essentials.fun.ServerAvatar;
-import me.fero.dictator.commands.essentials.fun.UserAvatar;
+import me.fero.dictator.commands.general.Help;
+import me.fero.dictator.commands.general.ServerAvatar;
+import me.fero.dictator.commands.general.UserAvatar;
 import me.fero.dictator.commands.essentials.manager.AddRole;
 import me.fero.dictator.commands.essentials.moderator.*;
 import me.fero.dictator.commands.general.Ping;
-import me.fero.dictator.commands.essentials.ChangePrefix;
+import me.fero.dictator.commands.essentials.manager.ChangePrefix;
 import me.fero.dictator.commands.setup.context.CommandContext;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 

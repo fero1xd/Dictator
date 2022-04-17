@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.entities.Member;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Kick extends ModbaseCommand{
     public Kick() {
@@ -23,12 +25,18 @@ public class Kick extends ModbaseCommand{
     @Override
     public void execute(@NotNull CommandContext ctx) {
 
-        if(ctx.getMessage().getMentionedMembers().isEmpty()) {
-            ModerationUtils.noMentionFoundEmbed(ctx, "kick");
-            return;
+        String contentRaw = ctx.getArgs().get(0);
+
+        Member memberToKick = ModerationUtils.parseMember(contentRaw, ctx.getGuild());
+
+        if(memberToKick == null) {
+            memberToKick = ModerationUtils.getMemberById(ctx);
+            if(memberToKick == null) {
+                ModerationUtils.noMentionFoundEmbed(ctx, "kick");
+                return;
+            }
         }
 
-        Member memberToKick = ctx.getMessage().getMentionedMembers().get(0);
         Member selfMember = ctx.getSelfMember();
 
 

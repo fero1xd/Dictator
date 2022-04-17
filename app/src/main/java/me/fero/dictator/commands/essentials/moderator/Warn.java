@@ -30,13 +30,13 @@ public class Warn extends ModbaseCommand{
     }
     @Override
     public void execute(@NotNull CommandContext ctx) {
-        List<Member> mentionedMembers = ctx.getMessage().getMentionedMembers();
-        if(mentionedMembers.isEmpty()) {
+        Member target = ModerationUtils.parseMember(ctx.getArgs().get(0), ctx.getGuild());
+
+        if(target == null) {
             ModerationUtils.noMentionFoundEmbed(ctx, "warn");
             return;
         }
 
-        Member target = mentionedMembers.get(0);
         Member member = ctx.getMember();
         Member selfMember = ctx.getSelfMember();
 

@@ -81,9 +81,9 @@ public class MongoDBManager implements DatabaseManager{
         MongoCollection<Document> guild_settings = this.db.getCollection("guild_settings");
         Document cursor = guild_settings.find(filter).first();
 
-        List<Document> afks = (List<Document>) cursor.get(field);
+        List<Document> docs = (List<Document>) cursor.get(field);
 
-        List<Document> collect = afks.stream().filter(afk -> !afk.get("_id").toString().equals(map.get("_id"))).collect(Collectors.toList());
+        List<Document> collect = docs.stream().filter(doc -> !doc.get("_id").toString().equals(map.get("_id"))).collect(Collectors.toList());
 
         Bson updated = Updates.set(field, collect);
         guild_settings.updateOne(filter, updated);

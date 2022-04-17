@@ -2,6 +2,7 @@ package me.fero.dictator.objects;
 
 import me.fero.dictator.commands.setup.ICommand;
 import me.fero.dictator.commands.setup.context.CommandContext;
+import me.fero.dictator.config.Config;
 import me.fero.dictator.redis.RedisDataStore;
 import me.fero.dictator.types.CommandCategory;
 import me.fero.dictator.utils.Embeds;

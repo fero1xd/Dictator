@@ -8,14 +8,13 @@ import me.fero.dictator.redis.RedisDataStore;
 import me.fero.dictator.types.Logging;
 import me.fero.dictator.types.Variables;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ModerationUtils {
     public static boolean canIntercat(Member mod, Member target, Member self, CommandContext ctx, String action, Boolean sendErrors) {
@@ -155,6 +154,28 @@ public class ModerationUtils {
             return null;
         }
 
+    }
+
+    public static Member getMemberById(CommandContext ctx) {
+        try {
+            return ctx.getGuild().retrieveMemberById(ctx.getArgs().get(0)).complete();
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
+
+    public static Member parseMember(String content, Guild guild) {
+        Pattern p = Pattern.compile("<@!*&*[0-9]+>");
+        Matcher m = p.matcher(content);
+
+        if(!m.matches()) {
+            return null;
+        }
+
+        String id = m.group(0).replaceAll("\\<", "").replaceAll("\\>", "").replaceAll("\\@", "").replaceAll("\\!", "").trim();
+        return guild.getMemberById(id);
     }
 
 }

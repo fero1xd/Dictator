@@ -29,22 +29,18 @@ public class Mute extends ModbaseCommand {
     @Override
     public void execute(@NotNull CommandContext ctx) {
         Member member = ctx.getMember();
-        if(ctx.getMessage().getMentionedMembers().isEmpty()) {
+
+        Member target = ModerationUtils.parseMember(ctx.getArgs().get(0), ctx.getGuild());
+
+        if(target == null) {
             ModerationUtils.noMentionFoundEmbed(ctx, "mute");
             return;
         }
 
-        Member target = ctx.getMessage().getMentionedMembers().get(0);
         Member selfMember = ctx.getSelfMember();
 
 
         if(!ModerationUtils.canIntercat(member, target, selfMember, ctx, "mute", true)) return;
-
-
-        if(ctx.getMessage().getMentionedMembers().isEmpty()) {
-            ModerationUtils.noMentionFoundEmbed(ctx, "mute");
-            return;
-        }
 
 
         Role muteRole = ModerationUtils.getRole(ctx, "mute", Variables.MUTE_ROLE_ID, true);

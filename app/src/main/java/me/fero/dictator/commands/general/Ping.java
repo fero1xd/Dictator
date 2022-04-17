@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import org.jetbrains.annotations.NotNull;
 
-public class Ping extends Command {
+public class Ping extends GeneralbaseCommand {
     public Ping() {
         this.name = "ping";
         this.help = "Replies with pong";

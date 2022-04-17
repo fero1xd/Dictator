@@ -34,13 +34,17 @@ public class Afk extends ModbaseCommand {
         Document doc = new Document("_id", ObjectId.get());
         doc.append(key, message);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
         doc.append("timestamp", timestamp);
 
         RedisManager.INSTANCE.addRecordToList(guild.getIdLong(), MongoDBFieldTypes.AFK_FIELD,  doc);
         MongoDBManager.INSTANCE.addRecordToList(guild.getIdLong(), MongoDBFieldTypes.AFK_FIELD, doc);
 
         channel.sendMessageEmbeds(Embeds.createBuilder("Success!", "AFK status : " + message, null, null, null).build()).queue();
-        if(!ctx.getSelfMember().canInteract(member)) return;
-        member.modifyNickname("[AFK] " + member.getEffectiveName()).queue();
+
+        try {
+            member.modifyNickname("[AFK] " + member.getEffectiveName()).queue();
+        } catch (Exception ignored) {
+        }
     }
 }

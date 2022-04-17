@@ -14,28 +14,24 @@ public class Unmute extends ModbaseCommand{
     public Unmute() {
         this.name = "unmute";
         this.help = "Unmutes a user from the server";
-        this.requiredArgCount = 1;
-        this.usage = "<mention>";
+        this.requiredArgs = true;
+        this.usage = "<mention> <reason>";
     }
 
     @Override
     public void execute(@NotNull CommandContext ctx) {
         Member member = ctx.getMember();
-        if(ctx.getMessage().getMentionedMembers().isEmpty()) {
+        Member target = ModerationUtils.parseMember(ctx.getArgs().get(0), ctx.getGuild());
+
+
+        if(target == null) {
             ModerationUtils.noMentionFoundEmbed(ctx, "unmute");
             return;
         }
 
-        Member target = ctx.getMessage().getMentionedMembers().get(0);
         Member selfMember = ctx.getSelfMember();
 
         if(!ModerationUtils.canIntercat(member, target, selfMember, ctx, "unmute", true)) return;
-
-
-        if(ctx.getMessage().getMentionedMembers().isEmpty()) {
-            ModerationUtils.noMentionFoundEmbed(ctx, "unmute");
-            return;
-        }
 
 
         String muteRoleId = ModerationUtils.getVariableFromGuildModel(ctx, Variables.MUTE_ROLE_ID);
@@ -59,8 +55,9 @@ public class Unmute extends ModbaseCommand{
             return;
         }
 
+        String reason = ModerationUtils.parseReason(ctx);
         ctx.getGuild().removeRoleFromMember(target, muteRole).queue((__) -> {
-            ModerationUtils.logModChannel(ctx, ModerationUtils.successModerationLog(ctx, target, null, "unmuted", "Not Available"), Logging.UNMUTE_LOG);
+            ModerationUtils.logModChannel(ctx, ModerationUtils.successModerationLog(ctx, target, null, "unmuted", reason != null ? reason : "Not Available"), Logging.UNMUTE_LOG);
             ModerationUtils.successEmbed(ctx, "unmuted", target, null);
         });
     }

@@ -1,4 +1,4 @@
-package me.fero.dictator.commands.essentials.fun;
+package me.fero.dictator.commands.general;
 
 import me.fero.dictator.commands.setup.context.CommandContext;
 import me.fero.dictator.objects.Command;
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ServerAvatar extends Command {
+public class ServerAvatar extends GeneralbaseCommand {
 
     public ServerAvatar(){
         this.name = "avatar";
